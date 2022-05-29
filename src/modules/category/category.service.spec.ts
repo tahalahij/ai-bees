@@ -25,113 +25,110 @@ const getMockCategory = (
   };
 };
 describe('Category Service Test', () => {
+  let categoryService: CategoryService;
+  let categoryModel: Model<CategoryDocument>;
+
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          envFilePath: '.env',
+        }),
+        MongooseModule.forFeature([{ name: Category.name, schema: CategorySchema }]),
+        MongooseModule.forRootAsync({
+          imports: [ConfigModule],
+          useFactory: async (configService: ConfigService) => ({
+            uri: configService.get<string>('MONGODB_URI'),
+          }),
+          inject: [ConfigService],
+        }),
+        CategoryModule,
+      ],
+      providers: [CategoryService],
+    }).compile();
+
+    categoryService = module.get<CategoryService>(CategoryService);
+    categoryModel = module.get<Model<CategoryDocument>>(getModelToken('Category'));
+  });
+
+  afterEach(async () => {
+    await categoryModel.remove({});
+    jest.restoreAllMocks();
+  });
+  it('should be defined', () => {
+    expect(categoryService).toBeDefined();
+  });
   describe('createCategory', () => {
-    let categoryService: CategoryService;
-    let categoryModel: Model<CategoryDocument>;
-
-    beforeEach(async () => {
-      const module: TestingModule = await Test.createTestingModule({
-        imports: [
-          ConfigModule.forRoot({
-            isGlobal: true,
-            envFilePath: '.env',
-          }),
-          MongooseModule.forFeature([{ name: Category.name, schema: CategorySchema }]),
-          MongooseModule.forRootAsync({
-            imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
-              uri: configService.get<string>('MONGODB_URI'),
-            }),
-            inject: [ConfigService],
-          }),
-          CategoryModule,
-        ],
-        providers: [CategoryService],
-      }).compile();
-
-      categoryService = module.get<CategoryService>(CategoryService);
-      categoryModel = module.get<Model<CategoryDocument>>(getModelToken('Category'));
-    });
-
-    afterEach(async () => {
-      await categoryModel.remove({});
-      jest.restoreAllMocks();
-    });
-
     it('should be defined', () => {
-      expect(categoryService).toBeDefined();
+      expect(categoryService.createCategory).toBeDefined();
     });
-    describe('createCategory', () => {
-      it('should be defined', () => {
-        expect(categoryService.createCategory).toBeDefined();
+    it('should create new category', async () => {
+      const name = 'ai';
+      const discount = 5;
+      const category = await categoryService.createCategory({
+        name,
+        discount,
       });
-      it('should create new category', async () => {
-        const name = 'ai';
-        const discount = 5;
-        const category = await categoryService.createCategory({
-          name,
-          discount,
-        });
-        expect(category).toHaveProperty('name', name);
-        expect(category).toHaveProperty('discount', discount);
-        expect(category.parent).toBeFalsy();
-      });
+      expect(category).toHaveProperty('name', name);
+      expect(category).toHaveProperty('discount', discount);
+      expect(category.parent).toBeFalsy();
     });
+  });
 
-    describe('getCategoryById', () => {
-      it('should be defined', () => {
-        expect(categoryService.getCategoryById).toBeDefined();
-      });
-      it('should return category', async () => {
-        const name = 'ai';
-        const discount = 5;
-        const doc = await categoryModel.create(getMockCategory({ name, discount }));
-        const category = await categoryService.getCategoryById(doc._id);
-        expect(category).toHaveProperty('name', doc.name);
-        expect(category).toHaveProperty('discount', doc.discount);
-        expect(category).toHaveProperty('parent', doc.parent);
-      });
+  describe('getCategoryById', () => {
+    it('should be defined', () => {
+      expect(categoryService.getCategoryById).toBeDefined();
     });
-
-    describe('getCategoryById', () => {
-      it('should be defined', () => {
-        expect(categoryService.getCategoryById).toBeDefined();
-      });
-      it('should return category', async () => {
-        const name = 'ai';
-        const discount = 5;
-        const doc = await categoryModel.create(getMockCategory({ name, discount }));
-        const category = await categoryService.getCategoryById(doc._id);
-        expect(category).toHaveProperty('name', doc.name);
-        expect(category).toHaveProperty('discount', doc.discount);
-        expect(category).toHaveProperty('parent', doc.parent);
-      });
-      it('should throw error if category not found', async () => {
-        await expect(categoryService.getCategoryById(getMockId())).rejects.toThrow(
-          MESSAGES.CATEGORY_NOT_FOUND,
-        );
-      });
+    it('should return category', async () => {
+      const name = 'ai';
+      const discount = 5;
+      const doc = await categoryModel.create(getMockCategory({ name, discount }));
+      const category = await categoryService.getCategoryById(doc._id);
+      expect(category).toHaveProperty('name', doc.name);
+      expect(category).toHaveProperty('discount', doc.discount);
+      expect(category).toHaveProperty('parent', doc.parent);
     });
+  });
 
-    describe('updateCategory', () => {
-      it('should be defined', () => {
-        expect(categoryService.updateCategory).toBeDefined();
-      });
-      it('should return updated category', async () => {
-        const name = 'ai';
-        const discount = 5;
-        const parent = getMockId();
-        const doc = await categoryModel.create(getMockCategory({}));
-        const category = await categoryService.updateCategory(doc._id, { discount, parent, name });
-        expect(category).toHaveProperty('name', name);
-        expect(category).toHaveProperty('discount', discount);
-        expect(category).toHaveProperty('parent', parent);
-      });
-      it('should throw error if category not found', async () => {
-        await expect(
-          categoryService.updateCategory(getMockId(), { name: 'new name' }),
-        ).rejects.toThrow(MESSAGES.CATEGORY_NOT_FOUND);
-      });
+  describe('getCategoryById', () => {
+    it('should be defined', () => {
+      expect(categoryService.getCategoryById).toBeDefined();
+    });
+    it('should return category', async () => {
+      const name = 'ai';
+      const discount = 5;
+      const doc = await categoryModel.create(getMockCategory({ name, discount }));
+      const category = await categoryService.getCategoryById(doc._id);
+      expect(category).toHaveProperty('name', doc.name);
+      expect(category).toHaveProperty('discount', doc.discount);
+      expect(category).toHaveProperty('parent', doc.parent);
+    });
+    it('should throw error if category not found', async () => {
+      await expect(categoryService.getCategoryById(getMockId())).rejects.toThrow(
+        MESSAGES.CATEGORY_NOT_FOUND,
+      );
+    });
+  });
+
+  describe('updateCategory', () => {
+    it('should be defined', () => {
+      expect(categoryService.updateCategory).toBeDefined();
+    });
+    it('should return updated category', async () => {
+      const name = 'ai';
+      const discount = 5;
+      const parent = getMockId();
+      const doc = await categoryModel.create(getMockCategory({}));
+      const category = await categoryService.updateCategory(doc._id, { discount, parent, name });
+      expect(category).toHaveProperty('name', name);
+      expect(category).toHaveProperty('discount', discount);
+      expect(category).toHaveProperty('parent', parent);
+    });
+    it('should throw error if category not found', async () => {
+      await expect(
+        categoryService.updateCategory(getMockId(), { name: 'new name' }),
+      ).rejects.toThrow(MESSAGES.CATEGORY_NOT_FOUND);
     });
   });
 });
