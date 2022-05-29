@@ -41,8 +41,8 @@ export class UpdateProductDto {
 
   @IsNumber()
   @IsOptional()
-  @ApiProperty()
-  discount: number;
+  @ApiPropertyOptional()
+  discount?: number;
 }
 
 export class GetDiscountDto {

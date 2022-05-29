@@ -1,40 +1,28 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Product, ProductDocument } from './models/product.model';
 import { MESSAGES } from './constants/constants';
-import {
-  CreateProductDto,
-  GetDiscountDto,
-  UpdateProductDto,
-} from './dtos/product.dto';
+import { CreateProductDto, GetDiscountDto, UpdateProductDto } from './dtos/product.dto';
 
 @Injectable()
 export class ProductService {
   logger = new Logger();
-  constructor(
-    @InjectModel(Product.name) private productModel: Model<ProductDocument>,
-  ) {}
+  constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>) {}
 
   async getProducts(page = 1, pageSize = 10): Promise<Product[]> {
     const skip = (page - 1) * pageSize;
-    const categories = await this.productModel
-      .find({})
-      .skip(skip)
-      .limit(pageSize)
-      .lean();
+    const categories = await this.productModel.find({}).skip(skip).limit(pageSize).lean();
     this.logger.debug('getProducts', { categories });
     return categories;
   }
 
-  async getProductById(id: number): Promise<Product> {
+  async getProductById(id: Types.ObjectId): Promise<Product> {
     const product = await this.productModel.findById(id).lean();
     this.logger.debug('getProductById', { product });
 
     if (!product) {
-      this.logger.debug(
-        `getProductById, ${MESSAGES.PRODUCT_NOT_FOUND} ,id: ${id} `,
-      );
+      this.logger.debug(`getProductById, ${MESSAGES.PRODUCT_NOT_FOUND} ,id: ${id} `);
       throw new NotFoundException(MESSAGES.PRODUCT_NOT_FOUND);
     }
 
@@ -42,20 +30,28 @@ export class ProductService {
   }
 
   async createProduct(body: CreateProductDto): Promise<Product> {
+    const exists = await this.productModel.exists({ code: body.code });
+    if (exists) {
+      this.logger.debug(`createProduct, ${MESSAGES.PRODUCT_DUPLICATE_CODE} ,code: ${body.code} `);
+      throw new BadRequestException(MESSAGES.PRODUCT_DUPLICATE_CODE);
+    }
     const product = await this.productModel.create(body);
 
     this.logger.debug(`createProduct, product created: `, { product });
     return product;
   }
 
-  async updateProduct(id: number, body: UpdateProductDto): Promise<Product> {
+  async updateProduct(id: Types.ObjectId, body: UpdateProductDto): Promise<Product> {
+    const exists = await this.productModel.exists({ code: body.code });
+    if (exists) {
+      this.logger.debug(`updateProduct, ${MESSAGES.PRODUCT_DUPLICATE_CODE} ,code: ${body.code} `);
+      throw new BadRequestException(MESSAGES.PRODUCT_DUPLICATE_CODE);
+    }
     const product = await this.productModel.findById(id);
     this.logger.debug('updateProduct', { product });
 
     if (!product) {
-      this.logger.debug(
-        `updateProduct, ${MESSAGES.PRODUCT_NOT_FOUND} ,id: ${id} `,
-      );
+      this.logger.debug(`updateProduct, ${MESSAGES.PRODUCT_NOT_FOUND} ,id: ${id} `);
       throw new NotFoundException(MESSAGES.PRODUCT_NOT_FOUND);
     }
     product.set(body);

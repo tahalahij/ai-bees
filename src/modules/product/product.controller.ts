@@ -1,29 +1,23 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-  ParseIntPipe,
-  Patch,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, ParseIntPipe, Patch } from '@nestjs/common';
 import { Product } from './models/product.model';
 import { ProductService } from './product.service';
 import { CreateProductDto, UpdateProductDto } from './dtos/product.dto';
 import {
+  ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 @ApiTags('products')
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
   @ApiCreatedResponse()
+  @ApiBadRequestResponse()
   @Post()
   create(@Body() createDto: CreateProductDto) {
     return this.productService.createProduct(createDto);
@@ -31,12 +25,10 @@ export class ProductController {
 
   @ApiQuery({ name: 'id', description: 'id of product' })
   @ApiNotFoundResponse()
+  @ApiBadRequestResponse()
   @ApiOkResponse()
   @Patch(':id')
-  updateProduct(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: UpdateProductDto,
-  ): Promise<Product> {
+  updateProduct(@Param('id') id: Types.ObjectId, @Body() body: UpdateProductDto): Promise<Product> {
     return this.productService.updateProduct(id, body);
   }
 
@@ -58,7 +50,7 @@ export class ProductController {
   @ApiOkResponse()
   @ApiNotFoundResponse()
   @Get(':id')
-  getProductById(@Param('id', ParseIntPipe) id: number): Promise<Product> {
+  getProductById(@Param('id') id: Types.ObjectId): Promise<Product> {
     return this.productService.getProductById(id);
   }
 
