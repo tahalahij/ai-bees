@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, IsOptional, IsMongoId, IsNumber } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 
 export class CreateProductDto {
   @IsString()
@@ -15,7 +15,7 @@ export class CreateProductDto {
 
   @IsMongoId()
   @ApiPropertyOptional()
-  parent: mongoose.ObjectId;
+  parent: Types.ObjectId;
 
   @IsNumber()
   @IsOptional()
@@ -37,7 +37,7 @@ export class UpdateProductDto {
   @IsMongoId()
   @IsOptional()
   @ApiPropertyOptional()
-  parent?: mongoose.ObjectId;
+  parent?: Types.ObjectId;
 
   @IsNumber()
   @IsOptional()

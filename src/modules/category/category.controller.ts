@@ -9,6 +9,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -25,7 +26,7 @@ export class CategoryController {
   @ApiOkResponse()
   @Patch(':id')
   updateCategory(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: Types.ObjectId,
     @Body() body: UpdateCategoryDto,
   ): Promise<Category> {
     return this.service.updateCategory(id, body);
@@ -49,7 +50,7 @@ export class CategoryController {
   @ApiOkResponse()
   @ApiNotFoundResponse()
   @Get(':id')
-  getCategoryById(@Param('id', ParseIntPipe) id: number): Promise<Category> {
+  getCategoryById(@Param('id') id: Types.ObjectId): Promise<Category> {
     return this.service.getCategoryById(id);
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Category, CategoryDocument } from './models/category.model';
 import { MESSAGES } from './constants/constants';
 import { CreateCategoryDto, UpdateCategoryDto } from './dtos/category.dto';
@@ -17,7 +17,7 @@ export class CategoryService {
     return categories;
   }
 
-  async getCategoryById(id: number): Promise<Category> {
+  async getCategoryById(id: Types.ObjectId): Promise<Category> {
     const category = await this.categoryModel.findById(id).lean();
     this.logger.debug('getCategoryById', { category });
 
@@ -36,7 +36,7 @@ export class CategoryService {
     return category;
   }
 
-  async updateCategory(id: number, body: UpdateCategoryDto): Promise<Category> {
+  async updateCategory(id: Types.ObjectId, body: UpdateCategoryDto): Promise<Category> {
     const category = await this.categoryModel.findById(id);
     this.logger.debug('updateCategory', { category });
 
