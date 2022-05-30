@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document, Types } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 export type CategoryDocument = Category & Document;
 @Schema()
 export class Category {
@@ -13,7 +13,7 @@ export class Category {
     },
     required: false,
   })
-  parent?: string | Types.ObjectId;
+  parent?: string;
 
   @Prop({ type: 'Number', default: 0 })
   discount: number;

@@ -4,21 +4,10 @@ import { CategoryModule } from './category.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Category, CategoryDocument, CategorySchema } from './models/category.model';
-import mongoose, { Model, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { MESSAGES } from './constants/constants';
 
 const getMockId = () => String(new Types.ObjectId());
-const getMockCategory = (
-  override: Partial<Category> = {},
-): { parent: string | mongoose.Schema.Types.ObjectId; name: string; discount: number; _id: string } => {
-  return {
-    _id: getMockId(),
-    name: 'CATEGORY',
-    parent: getMockId(),
-    discount: 10,
-    ...override,
-  };
-};
 describe('Category Service Test', () => {
   let categoryService: CategoryService;
   let categoryModel: Model<CategoryDocument>;
@@ -79,7 +68,11 @@ describe('Category Service Test', () => {
     it('should return category', async () => {
       const name = 'ai';
       const discount = 5;
-      const doc = await categoryModel.create(getMockCategory({ name, discount }));
+      const doc = await categoryModel.create({
+        parent: getMockId(),
+        name,
+        discount,
+      });
       const category = await categoryService.getCategoryById(doc._id);
       expect(category).toHaveProperty('name', doc.name);
       expect(category).toHaveProperty('discount', doc.discount);
@@ -94,7 +87,11 @@ describe('Category Service Test', () => {
     it('should return category', async () => {
       const name = 'ai';
       const discount = 5;
-      const doc = await categoryModel.create(getMockCategory({ name, discount }));
+      const doc = await categoryModel.create({
+        name,
+        discount,
+        parent: getMockId(),
+      });
       const category = await categoryService.getCategoryById(doc._id);
       expect(category).toHaveProperty('name', doc.name);
       expect(category).toHaveProperty('discount', doc.discount);
@@ -115,11 +112,12 @@ describe('Category Service Test', () => {
       const name = 'ai';
       const discount = 5;
       const parent = getMockId();
-      const doc = await categoryModel.create(getMockCategory({}));
+      const doc = await categoryModel.create({
+        name,
+        discount,
+        parent,
+      });
       const category = await categoryService.updateCategory(doc._id, { discount, parent, name });
-      console.log({
-        category
-      })
       expect(category).toHaveProperty('name', name);
       expect(category).toHaveProperty('discount', discount);
       expect(category).toHaveProperty('parent', parent);

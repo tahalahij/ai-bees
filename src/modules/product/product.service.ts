@@ -1,16 +1,18 @@
 import { Injectable, NotFoundException, Logger, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { Product, ProductDocument } from './models/product.model';
+import { Model } from 'mongoose';
+import { Product } from './models/product.model';
 import { MESSAGES } from './constants/constants';
 import { CreateProductDto, GetDiscountDto, UpdateProductDto } from './dtos/product.dto';
-import { IsMongoId } from 'class-validator';
-import { Category } from '../category/models/category.model';
+import { CategoryService } from '../category/category.service';
 
 @Injectable()
 export class ProductService {
   logger = new Logger();
-  constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>) {}
+  constructor(
+    @InjectModel(Product.name) private productModel: Model<Product>,
+    private categoryService: CategoryService,
+  ) {}
 
   async getProducts(page = 1, pageSize = 10): Promise<Product[]> {
     const skip = (page - 1) * pageSize;
@@ -19,7 +21,7 @@ export class ProductService {
     return categories;
   }
 
-  async getProductById(id:  string | Types.ObjectId): Promise<Product> {
+  async getProductById(id: string): Promise<Product> {
     const product = await this.productModel.findById(id).lean();
     this.logger.debug('getProductById', { product });
 
@@ -43,7 +45,7 @@ export class ProductService {
     return product;
   }
 
-  async updateProduct(id:  string | Types.ObjectId, body: UpdateProductDto): Promise<Product> {
+  async updateProduct(id: string, body: UpdateProductDto): Promise<Product> {
     const exists = await this.productModel.exists({ code: body.code });
     if (exists) {
       this.logger.debug(`updateProduct, ${MESSAGES.PRODUCT_DUPLICATE_CODE} ,code: ${body.code} `);
@@ -65,10 +67,7 @@ export class ProductService {
     amountAfterDiscount: number;
   }> {
     const product = await this.productModel.findOne({ code, name });
-    console.log('getDiscount', { product });
-    product.populate('parent');
-    console.log('after populate', { product });
-    return;
+    this.logger.debug('getDiscount', { product });
 
     if (!product) {
       this.logger.debug(
@@ -77,18 +76,26 @@ export class ProductService {
       throw new NotFoundException(MESSAGES.PRODUCT_NOT_FOUND);
     }
     let discount = product.discount;
-    if (discount === undefined) {
-      let path = 'parent';
-      while (IsMongoId(product[path])) {
-        product.populate({
-          path,
-          model: 'Category',
-        });
-        console.log('path', { product, path });
-        path = path.concat('parent');
-      }
-      console.log('getDiscount deep populate', { product, path });
-      discount = product[path].discount;
+    if (!discount) {
+      const data = await this.productModel.aggregate([
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'parent',
+            foreignField: '_id',
+            as: 'category',
+          },
+        },
+        {
+          $unwind: {
+            path: '$category',
+          },
+        },
+      ]);
+
+      console.log('*********************',{data})
+
+      discount = await this.categoryService.findDiscount(data[0].category.parent);
     }
     const result = {
       amountAfterDiscount: amount - discount,

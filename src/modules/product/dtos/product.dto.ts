@@ -14,8 +14,9 @@ export class CreateProductDto {
   name: string;
 
   @IsMongoId()
+  @IsOptional()
   @ApiPropertyOptional()
-  parent: Types.ObjectId;
+  parent: string;
 
   @IsNumber()
   @IsOptional()
@@ -37,7 +38,7 @@ export class UpdateProductDto {
   @IsMongoId()
   @IsOptional()
   @ApiPropertyOptional()
-parent?:  string | Types.ObjectId;
+  parent?: string;
 
   @IsNumber()
   @IsOptional()

@@ -17,7 +17,7 @@ export class CategoryService {
     return categories;
   }
 
-  async getCategoryById(id:  string | Types.ObjectId): Promise<Category> {
+  async getCategoryById(id: string): Promise<Category> {
     const category = await this.categoryModel.findById(id).lean();
     this.logger.debug('getCategoryById', { category });
 
@@ -36,7 +36,7 @@ export class CategoryService {
     return category;
   }
 
-  async updateCategory(id:  string | Types.ObjectId, body: UpdateCategoryDto): Promise<Category> {
+  async updateCategory(id: string, body: UpdateCategoryDto): Promise<Category> {
     const category = await this.categoryModel.findById(id);
     this.logger.debug('updateCategory', { category });
 
@@ -55,5 +55,12 @@ export class CategoryService {
     }
 
     return category.save();
+  }
+  async findDiscount(id: string): Promise<number> {
+    const data = await this.categoryModel.findById(id).lean();
+    if (data.parent) {
+      return this.findDiscount(data.parent);
+    }
+    return data.discount;
   }
 }

@@ -12,7 +12,7 @@ export class Product {
   name: string;
 
   @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' }, required: false })
-  parent?: string | Types.ObjectId;
+  parent?: string ;
 
   @Prop({ type: 'Number' })
   discount: number;

@@ -10,7 +10,6 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { Types } from 'mongoose';
 
 @ApiTags('products')
 @Controller('products')
@@ -28,7 +27,7 @@ export class ProductController {
   @ApiBadRequestResponse()
   @ApiOkResponse()
   @Patch(':id')
-  updateProduct(@Param('id') id:  string | Types.ObjectId, @Body() body: UpdateProductDto): Promise<Product> {
+  updateProduct(@Param('id') id:  string , @Body() body: UpdateProductDto): Promise<Product> {
     return this.productService.updateProduct(id, body);
   }
 
@@ -46,18 +45,12 @@ export class ProductController {
     return this.productService.getProducts(page, pageSize);
   }
 
-  @ApiQuery({ name: 'id', description: 'id of product' })
+  @ApiQuery({ name: 'name', description: 'name of product' })
+  @ApiQuery({ name: 'code', description: 'code of product' })
+  @ApiQuery({ name: 'amount', description: 'amount of invoice' })
   @ApiOkResponse()
   @ApiNotFoundResponse()
-  @Get(':id')
-  getProductById(@Param('id') id:  string | Types.ObjectId): Promise<Product> {
-    return this.productService.getProductById(id);
-  }
-
-  @ApiQuery({ name: 'id', description: 'id of product' })
-  @ApiOkResponse()
-  @ApiNotFoundResponse()
-  @Get(':id')
+  @Get('discount')
   getDiscount(
     @Query('name') name: string,
     @Query('code') code: string,
@@ -67,5 +60,13 @@ export class ProductController {
     amountAfterDiscount: number;
   }> {
     return this.productService.getDiscount({ name, code, amount });
+  }
+
+  @ApiQuery({ name: 'id', description: 'id of product' })
+  @ApiOkResponse()
+  @ApiNotFoundResponse()
+  @Get(':id')
+  getProductById(@Param('id') id:  string ): Promise<Product> {
+    return this.productService.getProductById(id);
   }
 }

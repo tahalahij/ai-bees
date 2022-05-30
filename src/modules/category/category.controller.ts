@@ -26,7 +26,7 @@ export class CategoryController {
   @ApiOkResponse()
   @Patch(':id')
   updateCategory(
-    @Param('id') id:  string | Types.ObjectId,
+    @Param('id') id:  string,
     @Body() body: UpdateCategoryDto,
   ): Promise<Category> {
     return this.service.updateCategory(id, body);
@@ -50,7 +50,7 @@ export class CategoryController {
   @ApiOkResponse()
   @ApiNotFoundResponse()
   @Get(':id')
-  getCategoryById(@Param('id') id:  string | Types.ObjectId): Promise<Category> {
+  getCategoryById(@Param('id') id:  string): Promise<Category> {
     return this.service.getCategoryById(id);
   }
 }

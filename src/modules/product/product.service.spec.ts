@@ -7,16 +7,17 @@ import { Product, ProductDocument, ProductSchema } from './models/product.model'
 import { Model, Types } from 'mongoose';
 import { MESSAGES } from './constants/constants';
 import { Category, CategoryDocument, CategorySchema } from '../category/models/category.model';
+import { CategoryModule } from '../category/category.module';
 
-const getMockId = () => new Types.ObjectId();
+const getMockId = (): string => String(new Types.ObjectId());
 const getMockProduct = (
   override: Partial<Product> = {},
 ): {
-  parent: (() => Types.ObjectId) | Types.ObjectId;
+  parent: string;
   code: string;
   name: string;
   discount: number;
-  _id:  string | Types.ObjectId;
+  _id: string;
 } => {
   return {
     name: 'NAME',
@@ -41,7 +42,7 @@ describe('Product Service Test', () => {
         }),
         MongooseModule.forFeature([
           { name: Product.name, schema: ProductSchema },
-          // { name: Category.name, schema: CategorySchema },
+          { name: Category.name, schema: CategorySchema },
         ]),
         MongooseModule.forRootAsync({
           imports: [ConfigModule],
@@ -51,6 +52,7 @@ describe('Product Service Test', () => {
           inject: [ConfigService],
         }),
         ProductModule,
+        CategoryModule,
       ],
       providers: [ProductService],
     }).compile();
@@ -60,8 +62,9 @@ describe('Product Service Test', () => {
     categoryModel = module.get<Model<CategoryDocument>>(getModelToken('Category'));
   });
 
-  afterEach(async () => {
+  beforeEach(async () => {
     await productModel.remove({});
+    await categoryModel.remove({});
     jest.restoreAllMocks();
   });
   it('should be defined', () => {
@@ -83,8 +86,8 @@ describe('Product Service Test', () => {
         discount,
       });
       console.log({
-        product
-      })
+        product,
+      });
       expect(product).toHaveProperty('name', name);
       expect(product).toHaveProperty('discount', discount);
       expect(product).toHaveProperty('parent', parent);
@@ -122,6 +125,10 @@ describe('Product Service Test', () => {
       const discount = 5;
       const doc = await productModel.create(getMockProduct({ name, discount, code }));
       const product = await productService.getProductById(doc._id);
+      console.log({
+        doc,
+        product
+      })
       expect(product).toHaveProperty('name', doc.name);
       expect(product).toHaveProperty('discount', doc.discount);
       expect(product).toHaveProperty('code', doc.code);
