@@ -54,6 +54,7 @@ describe('Category Service Test', () => {
       const category = await categoryService.createCategory({
         name,
         discount,
+        parent,
       });
       expect(category).toHaveProperty('name', name);
       expect(category).toHaveProperty('discount', discount);
@@ -121,7 +122,8 @@ describe('Category Service Test', () => {
       const category = await categoryService.updateCategory(doc._id, { discount, parent, name });
       expect(category).toHaveProperty('name', name);
       expect(category).toHaveProperty('discount', discount);
-      expect(category).toHaveProperty('parent', parent);
+      expect(category).toHaveProperty('parent');
+      expect(String(category.parent)).toBe(parent);
     });
     it('should throw error if category not found', async () => {
       await expect(
