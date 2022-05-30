@@ -5,10 +5,11 @@ Otherwise, we move to its parent category (if it exists) and check if it has a d
 If no discount was found the API will return -1.
 <p align="center">
 
-<p align="center">
-
 ![sequence diagram for getting discount](./doc/get-discount.seq.png)
 </p>
+
+<p align="center">
+
 ![component diagram ](./doc/components.modules.png)
 </p>
 
