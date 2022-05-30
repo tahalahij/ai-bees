@@ -48,7 +48,7 @@ describe('Category Service Test', () => {
       expect(categoryService.createCategory).toBeDefined();
     });
     it('should create new category', async () => {
-      const name = 'ai';
+      const name = 'AI';
       const discount = 5;
       const parent = getMockId();
       const category = await categoryService.createCategory({
@@ -87,7 +87,7 @@ describe('Category Service Test', () => {
       expect(categoryService.getCategoryById).toBeDefined();
     });
     it('should return category', async () => {
-      const name = 'ai';
+      const name = 'AI 2';
       const discount = 5;
       const doc = await categoryModel.create({
         name,
@@ -111,7 +111,7 @@ describe('Category Service Test', () => {
       expect(categoryService.updateCategory).toBeDefined();
     });
     it('should return updated category', async () => {
-      const name = 'ai';
+      const name = 'AI 3';
       const discount = 5;
       const parent = getMockId();
       const doc = await categoryModel.create({
