@@ -76,6 +76,13 @@ export class ProductService {
       throw new NotFoundException(MESSAGES.PRODUCT_NOT_FOUND);
     }
     let discount = product.discount;
+    if (!discount && !product.parent) {
+      return {
+        amountAfterDiscount: amount,
+        discount: -1,
+      };
+    }
+
     if (!discount) {
       const data = await this.productModel.aggregate([
         {
@@ -93,9 +100,12 @@ export class ProductService {
         },
       ]);
 
-      console.log('*********************',{data})
-
-      discount = await this.categoryService.findDiscount(data[0].category.parent);
+      console.log('*********************', { data });
+      if (data[0].category.parent) {
+        discount = await this.categoryService.findDiscount(data[0].category.parent);
+      } else {
+        discount = data[0].category.discount;
+      }
     }
     const result = {
       amountAfterDiscount: amount - discount,
