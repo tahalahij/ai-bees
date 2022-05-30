@@ -7,10 +7,8 @@ export class Category {
   name: string;
 
   @Prop({
-    type: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
-    },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
     required: false,
   })
   parent?: string;
