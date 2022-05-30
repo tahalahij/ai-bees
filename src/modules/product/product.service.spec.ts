@@ -123,10 +123,7 @@ describe('Product Service Test', () => {
       const discount = 5;
       const doc = await productModel.create(getMockProduct({ name, discount, code }));
       const product = await productService.getProductById(doc._id);
-      console.log({
-        doc,
-        product,
-      });
+
       expect(product).toHaveProperty('name', doc.name);
       expect(product).toHaveProperty('discount', doc.discount);
       expect(product).toHaveProperty('code', doc.code);
@@ -221,10 +218,6 @@ describe('Product Service Test', () => {
         parent: category1._id,
         discount: 20,
       });
-      console.log({
-        category1,
-        category2,
-      });
       await productModel.create({
         parent: category2._id,
         code,
@@ -236,7 +229,7 @@ describe('Product Service Test', () => {
         name,
       });
       expect(discount).toBe(category2.discount);
-      expect(amountAfterDiscount).toBe(1000 - category2.discount);
+      expect(amountAfterDiscount).toBe(800);
     });
     it('should throw error if product not found', async () => {
       await expect(

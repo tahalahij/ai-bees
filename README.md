@@ -39,6 +39,9 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Documentation
+[Api Documentation](http://localhost:3033/api/)
+
 ## Test
 
 ```bash

@@ -162,5 +162,15 @@ describe('Category Service Test', () => {
       const result = await categoryService.findDiscount(c1._id);
       expect(result).toBe(-1);
     });
+    it('should return discount if category has', async () => {
+      const name = 'AI 5';
+      const discount = 100;
+      const c1 = await categoryModel.create({
+        name,
+        discount,
+      });
+      const result = await categoryService.findDiscount(c1._id);
+      expect(result).toBe(discount);
+    });
   });
 });

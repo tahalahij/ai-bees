@@ -34,9 +34,6 @@ export class ProductService {
   }
 
   async createProduct(body: CreateProductDto): Promise<Product> {
-    console.log('createProduct', {
-      body,
-    });
     const exists = await this.productModel.exists({ code: body.code });
     if (exists) {
       this.logger.debug(`createProduct, ${MESSAGES.PRODUCT_DUPLICATE_CODE} ,code: ${body.code} `);
@@ -91,7 +88,7 @@ export class ProductService {
     }
 
     const result = {
-      amountAfterDiscount: amount - discount,
+      amountAfterDiscount: discount === -1 ? amount : (amount * (100 - discount)) / 100,
       discount,
     };
     this.logger.debug('getDiscount discount calculated', { result });
