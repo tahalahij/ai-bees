@@ -131,4 +131,36 @@ describe('Category Service Test', () => {
       ).rejects.toThrow(MESSAGES.CATEGORY_NOT_FOUND);
     });
   });
+
+  describe('findDiscount', () => {
+    it('should be defined', () => {
+      expect(categoryService.findDiscount).toBeDefined();
+    });
+    it('should return ancestors discount if category doesnt have discount', async () => {
+      const name = 'AI 3';
+      const discount = 100;
+      const c1 = await categoryModel.create({
+        name,
+        discount,
+      });
+      const c2 = await categoryModel.create({
+        name,
+        parent: c1._id,
+      });
+      const c3 = await categoryModel.create({
+        name,
+        parent: c2._id,
+      });
+      const result = await categoryService.findDiscount(c3._id);
+      expect(result).toBe(discount);
+    });
+    it('should return -1 if category doesnt have discount or parent', async () => {
+      const name = 'AI 4';
+      const c1 = await categoryModel.create({
+        name,
+      });
+      const result = await categoryService.findDiscount(c1._id);
+      expect(result).toBe(-1);
+    });
+  });
 });
