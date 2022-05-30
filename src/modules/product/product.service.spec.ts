@@ -85,12 +85,10 @@ describe('Product Service Test', () => {
         parent,
         discount,
       });
-      console.log({
-        product,
-      });
       expect(product).toHaveProperty('name', name);
       expect(product).toHaveProperty('discount', discount);
-      expect(product).toHaveProperty('parent', parent);
+      expect(product).toHaveProperty('parent');
+      expect(String(product.parent)).toBe(parent);
       expect(product).toHaveProperty('code', code);
     });
     it('should throw error of product with this code exists', async () => {
@@ -127,8 +125,8 @@ describe('Product Service Test', () => {
       const product = await productService.getProductById(doc._id);
       console.log({
         doc,
-        product
-      })
+        product,
+      });
       expect(product).toHaveProperty('name', doc.name);
       expect(product).toHaveProperty('discount', doc.discount);
       expect(product).toHaveProperty('code', doc.code);
@@ -178,7 +176,8 @@ describe('Product Service Test', () => {
       expect(product).toHaveProperty('name', name);
       expect(product).toHaveProperty('code', code);
       expect(product).toHaveProperty('discount', discount);
-      expect(product).toHaveProperty('parent', parent);
+      expect(product).toHaveProperty('parent');
+      expect(String(product.parent)).toBe(parent);
     });
     it('should throw error of product with this code exists', async () => {
       const code = 'product code';

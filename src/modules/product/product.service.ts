@@ -34,6 +34,9 @@ export class ProductService {
   }
 
   async createProduct(body: CreateProductDto): Promise<Product> {
+    console.log('createProduct', {
+      body,
+    });
     const exists = await this.productModel.exists({ code: body.code });
     if (exists) {
       this.logger.debug(`createProduct, ${MESSAGES.PRODUCT_DUPLICATE_CODE} ,code: ${body.code} `);
