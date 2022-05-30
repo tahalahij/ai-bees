@@ -66,7 +66,7 @@ export class ProductService {
     discount: number;
     amountAfterDiscount: number;
   }> {
-    const product = await this.productModel.findOne({ code, name });
+    const product = await this.productModel.findOne({ code, name }).populate('parent');
     this.logger.debug('getDiscount', { product });
 
     if (!product) {
@@ -76,37 +76,17 @@ export class ProductService {
       throw new NotFoundException(MESSAGES.PRODUCT_NOT_FOUND);
     }
     let discount = product.discount;
-    if (!discount && !product.parent) {
-      return {
-        amountAfterDiscount: amount,
-        discount: -1,
-      };
-    }
 
     if (!discount) {
-      const data = await this.productModel.aggregate([
-        {
-          $lookup: {
-            from: 'categories',
-            localField: 'parent',
-            foreignField: '_id',
-            as: 'category',
-          },
-        },
-        {
-          $unwind: {
-            path: '$category',
-          },
-        },
-      ]);
-
-      console.log('*********************', { data });
-      if (data[0].category.parent) {
-        discount = await this.categoryService.findDiscount(data[0].category.parent);
-      } else {
-        discount = data[0].category.discount;
+      if (!product.parent) {
+        return {
+          amountAfterDiscount: amount,
+          discount: -1,
+        };
       }
+      discount = await this.categoryService.findDiscount(product.parent);
     }
+
     const result = {
       amountAfterDiscount: amount - discount,
       discount,
