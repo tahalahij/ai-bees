@@ -3,7 +3,7 @@ POST http://localhost:3033/api/v1/categories
 Content-Type: application/json
 
 {
-"name": "c1",
+"name": "c4",
 "discount": 20
 }
 
@@ -12,9 +12,19 @@ POST http://localhost:3033/api/v1/categories
 Content-Type: application/json
 
 {
-"parent": "6294f3175436f68a96708090",
-"name": "c2",
+"parent": "6295107dd9bc5b7e56434c8a",
+"name": "c5",
 "discount": 30
+}
+
+#### create category
+POST http://localhost:3033/api/v1/categories
+Content-Type: application/json
+
+{
+"parent": "6295108bd9bc5b7e56434c8c",
+"name": "c7",
+"discount": 400
 }
 
 #### create product
@@ -22,11 +32,11 @@ POST http://localhost:3033/api/v1/products
 Content-Type: application/json
 
 {
-  "code": "p4",
-  "parent": "6294f3265436f68a96708092",
-  "name": "p4"
+  "code": "p9",
+  "parent": "62951328a92e838165e370e4",
+  "name": "p9"
 }
 
 #### get discount
-GET http://localhost:3033/api/v1/products/discount?name=p4&code=p4&amount=1000
+GET http://localhost:3033/api/v1/products/discount?name=p9&code=p9&amount=1000
 Content-Type: application/json
