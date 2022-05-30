@@ -1,0 +1,32 @@
+@startuml
+!theme bluegray
+skinparam backgroundColor azure
+skinparam sequenceMessageAlign center
+
+participant Client                       as CL
+participant "Product Service"            as P
+participant "Category Service"           as C
+
+CL -> P :  get discount
+note right
+    {
+    code
+    name
+    amount
+    }
+end note
+alt#Gold #LightBlue product has discount
+    CL <-- P : $success("discount , amountAfterDiscount")
+else #Pink product doesnt have discount
+    P -> C : "get discount from parent category"
+    alt#Gold #LightBlue category has discount
+    P <-- C : $success("category.discount")
+    else #Pink category doesnt have discount
+    C <-- C : "get discount from parent category"
+    end
+    CL <-- P : $success("discount , amountAfterDiscount")
+end
+
+||40||
+
+@enduml

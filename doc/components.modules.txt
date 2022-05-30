@@ -1,0 +1,51 @@
+@startuml
+skinparam Component{
+    FontSize 14
+    backgroundColor gold
+    borderColor orange
+}
+
+skinparam frame{
+    FontSize 12
+    FontName Courier
+}
+
+[Product]{
+
+database "product repository" {
+ }
+}
+
+[Category]{
+database "category repository" {
+ }
+}
+
+[Product] --> [Category]
+
+
+
+[Payment] --> [Transaction]
+[Payment] --> [Rate]
+TW - [Payment]
+
+
+[WhiteLabel] --> [Transaction]
+[WhiteLabel] --> [Kyc]
+[WhiteLabel] ..> Seon : Risk score
+[WhiteLabel] ..> Kount : Risk score
+
+
+
+[WhiteLabel] --> [Rate]
+[Rate]..> Kraken : Rates
+[Rate]..> Nexo : Rates
+
+
+
+[Kyc]..> S3 : Storage
+[Kyc]..> Jumio : Identity Verification
+JW - [Kyc]
+
+
+@enduml
