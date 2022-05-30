@@ -57,10 +57,13 @@ export class CategoryService {
     return category.save();
   }
   async findDiscount(id: string): Promise<number> {
-    const data = await this.categoryModel.findById(id).lean();
-    if (data.parent) {
-      return this.findDiscount(data.parent);
+    const category = await this.categoryModel.findById(id).lean();
+    if (category.discount) {
+      return category.discount;
     }
-    return data.discount;
+    if (category.parent) {
+      return this.findDiscount(category.parent);
+    }
+    return -1;
   }
 }
