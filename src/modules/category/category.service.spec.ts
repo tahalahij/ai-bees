@@ -57,7 +57,8 @@ describe('Category Service Test', () => {
       });
       expect(category).toHaveProperty('name', name);
       expect(category).toHaveProperty('discount', discount);
-      expect(category).toHaveProperty('parent', parent);
+      expect(category).toHaveProperty('parent');
+      expect(String(category.parent)).toBe(parent);
     });
   });
 
