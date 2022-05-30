@@ -10,7 +10,7 @@ export class CreateCategoryDto {
 
   @IsMongoId()
   @ApiPropertyOptional()
-  parent?: Types.ObjectId;
+  parent?: string | Types.ObjectId;
 
   @IsNumber()
   @IsNotEmpty()
@@ -27,7 +27,7 @@ export class UpdateCategoryDto {
   @IsMongoId()
   @IsOptional()
   @ApiPropertyOptional()
-  parent?: Types.ObjectId;
+  parent?: string | Types.ObjectId;
 
   @IsNumber()
   @IsOptional()

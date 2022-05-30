@@ -4,18 +4,13 @@ import { CategoryModule } from './category.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Category, CategoryDocument, CategorySchema } from './models/category.model';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { MESSAGES } from './constants/constants';
 
-const getMockId = () => new Types.ObjectId();
+const getMockId = () => String(new Types.ObjectId());
 const getMockCategory = (
   override: Partial<Category> = {},
-): {
-  parent: (() => Types.ObjectId) | Types.ObjectId;
-  name: string;
-  discount: number;
-  _id: Types.ObjectId;
-} => {
+): { parent: string | mongoose.Schema.Types.ObjectId; name: string; discount: number; _id: string } => {
   return {
     _id: getMockId(),
     name: 'CATEGORY',
@@ -66,13 +61,14 @@ describe('Category Service Test', () => {
     it('should create new category', async () => {
       const name = 'ai';
       const discount = 5;
+      const parent = getMockId();
       const category = await categoryService.createCategory({
         name,
         discount,
       });
       expect(category).toHaveProperty('name', name);
       expect(category).toHaveProperty('discount', discount);
-      expect(category.parent).toBeFalsy();
+      expect(category).toHaveProperty('parent', parent);
     });
   });
 
@@ -121,6 +117,9 @@ describe('Category Service Test', () => {
       const parent = getMockId();
       const doc = await categoryModel.create(getMockCategory({}));
       const category = await categoryService.updateCategory(doc._id, { discount, parent, name });
+      console.log({
+        category
+      })
       expect(category).toHaveProperty('name', name);
       expect(category).toHaveProperty('discount', discount);
       expect(category).toHaveProperty('parent', parent);

@@ -17,7 +17,7 @@ export class CategoryService {
     return categories;
   }
 
-  async getCategoryById(id: Types.ObjectId): Promise<Category> {
+  async getCategoryById(id:  string | Types.ObjectId): Promise<Category> {
     const category = await this.categoryModel.findById(id).lean();
     this.logger.debug('getCategoryById', { category });
 
@@ -36,7 +36,7 @@ export class CategoryService {
     return category;
   }
 
-  async updateCategory(id: Types.ObjectId, body: UpdateCategoryDto): Promise<Category> {
+  async updateCategory(id:  string | Types.ObjectId, body: UpdateCategoryDto): Promise<Category> {
     const category = await this.categoryModel.findById(id);
     this.logger.debug('updateCategory', { category });
 
@@ -44,7 +44,16 @@ export class CategoryService {
       this.logger.debug(`updateCategory, ${MESSAGES.CATEGORY_NOT_FOUND} ,id: ${id} `);
       throw new NotFoundException(MESSAGES.CATEGORY_NOT_FOUND);
     }
-    category.set(body);
+    if (body.name) {
+      category.name = body.name;
+    }
+    if (body.discount) {
+      category.discount = body.discount;
+    }
+    if (body.parent) {
+      category.parent = body.parent;
+    }
+
     return category.save();
   }
 }

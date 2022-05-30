@@ -7,11 +7,13 @@ export class Category {
   name: string;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
-    default: null,
+    type: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+    },
+    required: false,
   })
-  parent?: Types.ObjectId;
+  parent?: string | Types.ObjectId;
 
   @Prop({ type: 'Number', default: 0 })
   discount: number;
