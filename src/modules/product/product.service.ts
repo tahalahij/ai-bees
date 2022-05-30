@@ -4,6 +4,8 @@ import { Model, Types } from 'mongoose';
 import { Product, ProductDocument } from './models/product.model';
 import { MESSAGES } from './constants/constants';
 import { CreateProductDto, GetDiscountDto, UpdateProductDto } from './dtos/product.dto';
+import { IsMongoId } from 'class-validator';
+import { Category } from '../category/models/category.model';
 
 @Injectable()
 export class ProductService {
@@ -17,7 +19,7 @@ export class ProductService {
     return categories;
   }
 
-  async getProductById(id: Types.ObjectId): Promise<Product> {
+  async getProductById(id:  string | Types.ObjectId): Promise<Product> {
     const product = await this.productModel.findById(id).lean();
     this.logger.debug('getProductById', { product });
 
@@ -41,7 +43,7 @@ export class ProductService {
     return product;
   }
 
-  async updateProduct(id: Types.ObjectId, body: UpdateProductDto): Promise<Product> {
+  async updateProduct(id:  string | Types.ObjectId, body: UpdateProductDto): Promise<Product> {
     const exists = await this.productModel.exists({ code: body.code });
     if (exists) {
       this.logger.debug(`updateProduct, ${MESSAGES.PRODUCT_DUPLICATE_CODE} ,code: ${body.code} `);
@@ -63,7 +65,10 @@ export class ProductService {
     amountAfterDiscount: number;
   }> {
     const product = await this.productModel.findOne({ code, name });
-    this.logger.debug('getDiscount', { product });
+    console.log('getDiscount', { product });
+    product.populate('parent');
+    console.log('after populate', { product });
+    return;
 
     if (!product) {
       this.logger.debug(
@@ -74,13 +79,15 @@ export class ProductService {
     let discount = product.discount;
     if (discount === undefined) {
       let path = 'parent';
-      while (product[path] !== undefined) {
+      while (IsMongoId(product[path])) {
         product.populate({
           path,
           model: 'Category',
         });
+        console.log('path', { product, path });
+        path = path.concat('parent');
       }
-      this.logger.debug('getDiscount deep populate', { product, path });
+      console.log('getDiscount deep populate', { product, path });
       discount = product[path].discount;
     }
     const result = {

@@ -37,7 +37,7 @@ export class UpdateProductDto {
   @IsMongoId()
   @IsOptional()
   @ApiPropertyOptional()
-  parent?: Types.ObjectId;
+parent?:  string | Types.ObjectId;
 
   @IsNumber()
   @IsOptional()

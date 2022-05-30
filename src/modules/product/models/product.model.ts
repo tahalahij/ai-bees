@@ -11,8 +11,8 @@ export class Product {
   @Prop({ type: 'String', required: true })
   name: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Category' })
-  parent?: Types.ObjectId;
+  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' }, required: false })
+  parent?: string | Types.ObjectId;
 
   @Prop({ type: 'Number' })
   discount: number;

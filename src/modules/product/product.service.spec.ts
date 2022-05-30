@@ -6,6 +6,7 @@ import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Product, ProductDocument, ProductSchema } from './models/product.model';
 import { Model, Types } from 'mongoose';
 import { MESSAGES } from './constants/constants';
+import { Category, CategoryDocument, CategorySchema } from '../category/models/category.model';
 
 const getMockId = () => new Types.ObjectId();
 const getMockProduct = (
@@ -15,7 +16,7 @@ const getMockProduct = (
   code: string;
   name: string;
   discount: number;
-  _id: Types.ObjectId;
+  _id:  string | Types.ObjectId;
 } => {
   return {
     name: 'NAME',
@@ -29,6 +30,7 @@ const getMockProduct = (
 describe('Product Service Test', () => {
   let productService: ProductService;
   let productModel: Model<ProductDocument>;
+  let categoryModel: Model<CategoryDocument>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -37,7 +39,10 @@ describe('Product Service Test', () => {
           isGlobal: true,
           envFilePath: '.env',
         }),
-        MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
+        MongooseModule.forFeature([
+          { name: Product.name, schema: ProductSchema },
+          // { name: Category.name, schema: CategorySchema },
+        ]),
         MongooseModule.forRootAsync({
           imports: [ConfigModule],
           useFactory: async (configService: ConfigService) => ({
@@ -52,6 +57,7 @@ describe('Product Service Test', () => {
 
     productService = module.get<ProductService>(ProductService);
     productModel = module.get<Model<ProductDocument>>(getModelToken('Product'));
+    categoryModel = module.get<Model<CategoryDocument>>(getModelToken('Category'));
   });
 
   afterEach(async () => {
@@ -76,6 +82,9 @@ describe('Product Service Test', () => {
         parent,
         discount,
       });
+      console.log({
+        product
+      })
       expect(product).toHaveProperty('name', name);
       expect(product).toHaveProperty('discount', discount);
       expect(product).toHaveProperty('parent', parent);
@@ -192,27 +201,41 @@ describe('Product Service Test', () => {
     it('should be defined', () => {
       expect(productService.getDiscount).toBeDefined();
     });
-    it('should return updated product', async () => {
+    it('should use the discount of nested category', async () => {
       const code = 'product code';
       const name = 'product name';
-      const discount = 5;
-      const parent = getMockId();
-      const doc = await productModel.create(getMockProduct({}));
-      const product = await productService.updateProduct(doc._id, {
-        discount,
-        parent,
-        name,
-        code,
+      const amount = 1000;
+      const category1 = await categoryModel.create({
+        name: 'CATEGORY 1',
+        parent: null,
+        discount: 10,
       });
-      expect(product).toHaveProperty('name', name);
-      expect(product).toHaveProperty('code', code);
-      expect(product).toHaveProperty('discount', discount);
-      expect(product).toHaveProperty('parent', parent);
+      const category2 = await categoryModel.create({
+        name: 'CATEGORY 2',
+        parent: category1._id,
+        discount: 20,
+      });
+      console.log({
+        category1,
+        category2,
+      });
+      await productModel.create({
+        parent: category2._id,
+        code,
+        name,
+      });
+      const { amountAfterDiscount, discount } = await productService.getDiscount({
+        amount,
+        code,
+        name,
+      });
+      expect(discount).toBe(category2.discount);
+      expect(amountAfterDiscount).toBe(1000 - category2.discount);
     });
     it('should throw error if product not found', async () => {
-      await expect(productService.updateProduct(getMockId(), { code: 'new code' })).rejects.toThrow(
-        MESSAGES.PRODUCT_NOT_FOUND,
-      );
+      await expect(
+        productService.getDiscount({ code: 'new code', amount: 1000, name: 'name' }),
+      ).rejects.toThrow(MESSAGES.PRODUCT_NOT_FOUND);
     });
   });
 });

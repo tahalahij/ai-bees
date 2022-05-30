@@ -28,7 +28,7 @@ export class ProductController {
   @ApiBadRequestResponse()
   @ApiOkResponse()
   @Patch(':id')
-  updateProduct(@Param('id') id: Types.ObjectId, @Body() body: UpdateProductDto): Promise<Product> {
+  updateProduct(@Param('id') id:  string | Types.ObjectId, @Body() body: UpdateProductDto): Promise<Product> {
     return this.productService.updateProduct(id, body);
   }
 
@@ -50,7 +50,7 @@ export class ProductController {
   @ApiOkResponse()
   @ApiNotFoundResponse()
   @Get(':id')
-  getProductById(@Param('id') id: Types.ObjectId): Promise<Product> {
+  getProductById(@Param('id') id:  string | Types.ObjectId): Promise<Product> {
     return this.productService.getProductById(id);
   }
 
