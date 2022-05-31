@@ -1,11 +1,20 @@
-#### create product
+#### signup
 POST http://localhost:3033/api/v1/users/signup
 Content-Type: application/json
 
 {
   "password": "the secret",
   "fullName": "taha lahij",
-  "username": "taha"
+  "username": "taha2"
+}
+
+#### login
+POST http://localhost:3033/api/v1/users/login
+Content-Type: application/json
+
+{
+  "password": "the secret",
+  "username": "taha2"
 }
 
 

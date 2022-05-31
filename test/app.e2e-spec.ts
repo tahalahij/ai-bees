@@ -57,14 +57,13 @@ describe('AppController (e2e)', () => {
       .send(loginBody)
       .expect(200);
     const { accessToken } = logindRes.body;
-
     // create category
     const c1Body: CreateCategoryDto = {
       discount: 10,
       name: 'grand parent',
     };
     const c1BodyRes = await request(app.getHttpServer())
-      .post('/products')
+      .post('/categories')
       .set({ authorization: `Bearer ${accessToken}` })
       .send(c1Body)
       .expect(201);
@@ -75,7 +74,7 @@ describe('AppController (e2e)', () => {
       parent: c1Id,
     };
     const c2BodyRes = await request(app.getHttpServer())
-      .post('/products')
+      .post('/categories')
       .set({ authorization: `Bearer ${accessToken}` })
       .send(c2Body)
       .expect(201);
@@ -87,7 +86,7 @@ describe('AppController (e2e)', () => {
       parent: c2Id,
     };
     const c3BodyRes = await request(app.getHttpServer())
-      .post('/products')
+      .post('/categories')
       .set({ authorization: `Bearer ${accessToken}` })
       .send(c3Body)
       .expect(201);
@@ -108,10 +107,11 @@ describe('AppController (e2e)', () => {
 
     // get discount
     const getDiscountRes = await request(app.getHttpServer())
-      .get(`/products/discount?code:${productCode}&amount=1000`)
-      .set({ 'authorization': `Bearer ${accessToken}` })
+      .get(`/products/discount?code=${productCode}&amount=1000`)
+      .set({ authorization: `Bearer ${accessToken}` })
       .expect(200);
-    // const  = getDiscountRes.body;
-    console.log({ getDiscountRes: getDiscountRes.body });
+    const { amountAfterDiscount, discount } = getDiscountRes.body;
+    expect(amountAfterDiscount).toBe(900);
+    expect(discount).toBe(10);
   });
 });
