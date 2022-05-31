@@ -1,0 +1,62 @@
+#### signup
+POST http://localhost:3033/api/v1/users/signup
+Content-Type: application/json
+
+{
+  "password": "the secret",
+  "fullName": "taha lahij",
+  "username": "taha2"
+}
+
+#### login
+POST http://localhost:3033/api/v1/users/login
+Content-Type: application/json
+
+{
+  "password": "the secret",
+  "username": "taha2"
+}
+
+
+#### create category
+POST http://localhost:3033/api/v1/categories
+Content-Type: application/json
+
+{
+"name": "c1",
+"discount": 20
+}
+
+#### create category
+POST http://localhost:3033/api/v1/categories
+Content-Type: application/json
+
+{
+"parent": "629514b5982427c2626ef242",
+"name": "c2",
+"discount": 30
+}
+
+#### create category
+POST http://localhost:3033/api/v1/categories
+Content-Type: application/json
+
+{
+"parent": "629514d5982427c2626ef244",
+"name": "c3",
+"discount": 400
+}
+
+#### create product
+POST http://localhost:3033/api/v1/products
+Content-Type: application/json
+
+{
+  "code": "p1",
+  "parent": "629514e4982427c2626ef246",
+  "name": "p1"
+}
+
+#### get discount
+GET http://localhost:3033/api/v1/products/discount?name=p1&code=p1&amount=1000
+Content-Type: application/json
