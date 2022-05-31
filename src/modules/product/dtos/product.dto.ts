@@ -16,12 +16,12 @@ export class CreateProductDto {
   @IsMongoId()
   @IsOptional()
   @ApiPropertyOptional()
-  parent: string;
+  parent?: string;
 
   @IsNumber()
   @IsOptional()
   @ApiProperty()
-  discount: number;
+  discount?: number;
 }
 
 export class UpdateProductDto {
@@ -51,11 +51,6 @@ export class GetDiscountDto {
   @IsOptional()
   @ApiPropertyOptional()
   code?: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiPropertyOptional()
-  name?: string;
 
   @IsNumber()
   @IsNotEmpty()

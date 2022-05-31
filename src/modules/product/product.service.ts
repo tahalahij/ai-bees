@@ -8,7 +8,7 @@ import { CategoryService } from '../category/category.service';
 
 @Injectable()
 export class ProductService {
-  logger = new Logger();
+  logger = new Logger(ProductService.name);
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
     private categoryService: CategoryService,
@@ -62,16 +62,16 @@ export class ProductService {
     return product.save();
   }
 
-  async getDiscount({ amount, code, name }: GetDiscountDto): Promise<{
+  async getDiscount({ amount, code }: GetDiscountDto): Promise<{
     discount: number;
     amountAfterDiscount: number;
   }> {
-    const product = await this.productModel.findOne({ code, name }).populate('parent');
+    const product = await this.productModel.findOne({ code }).populate('parent');
     this.logger.debug('getDiscount', { product });
 
     if (!product) {
       this.logger.debug(
-        `getDiscount, ${MESSAGES.PRODUCT_NOT_FOUND} ,code: ${code}, name: ${name} `,
+        `getDiscount, ${MESSAGES.PRODUCT_NOT_FOUND} ,code: ${code} `,
       );
       throw new NotFoundException(MESSAGES.PRODUCT_NOT_FOUND);
     }

@@ -8,13 +8,14 @@ export class CreateCategoryDto {
   name: string;
 
   @IsMongoId()
+  @IsOptional()
   @ApiPropertyOptional()
   parent?: string;
 
   @IsNumber()
-  @IsNotEmpty()
-  @ApiProperty()
-  discount: number;
+  @IsOptional()
+  @ApiPropertyOptional()
+  discount?: number;
 }
 
 export class UpdateCategoryDto {
@@ -26,7 +27,7 @@ export class UpdateCategoryDto {
   @IsMongoId()
   @IsOptional()
   @ApiPropertyOptional()
-  parent?: string ;
+  parent?: string;
 
   @IsNumber()
   @IsOptional()

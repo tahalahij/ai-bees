@@ -4,6 +4,7 @@ import * as winston from 'winston';
 import { WinstonModule } from 'nest-winston';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -34,6 +35,9 @@ async function bootstrap(): Promise<void> {
   SwaggerModule.setup('api', app, document);
 
   app.setGlobalPrefix('api/v1');
-  await app.listen(configService.get('PORT'));
+  const port = configService.get('PORT')
+  await app.listen(port);
+  const logger = new Logger();
+  logger.log(`App running on port ${port} \n API Doc : http://localhost:3033/api/`)
 }
 bootstrap();

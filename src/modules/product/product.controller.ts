@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Query, ParseIntPipe, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  ParseIntPipe,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import { Product } from './models/product.model';
 import { ProductService } from './product.service';
 import { CreateProductDto, UpdateProductDto } from './dtos/product.dto';
@@ -10,9 +20,11 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.gaurd';
 
 @ApiTags('products')
 @Controller('products')
+@UseGuards(JwtAuthGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
   @ApiCreatedResponse()
@@ -27,7 +39,7 @@ export class ProductController {
   @ApiBadRequestResponse()
   @ApiOkResponse()
   @Patch(':id')
-  updateProduct(@Param('id') id:  string , @Body() body: UpdateProductDto): Promise<Product> {
+  updateProduct(@Param('id') id: string, @Body() body: UpdateProductDto): Promise<Product> {
     return this.productService.updateProduct(id, body);
   }
 
@@ -45,28 +57,26 @@ export class ProductController {
     return this.productService.getProducts(page, pageSize);
   }
 
-  @ApiQuery({ name: 'name', description: 'name of product' })
   @ApiQuery({ name: 'code', description: 'code of product' })
   @ApiQuery({ name: 'amount', description: 'amount of invoice' })
   @ApiOkResponse()
   @ApiNotFoundResponse()
   @Get('discount')
   getDiscount(
-    @Query('name') name: string,
     @Query('code') code: string,
     @Query('amount', ParseIntPipe) amount: number,
   ): Promise<{
     discount: number;
     amountAfterDiscount: number;
   }> {
-    return this.productService.getDiscount({ name, code, amount });
+    return this.productService.getDiscount({ code, amount });
   }
 
   @ApiQuery({ name: 'id', description: 'id of product' })
   @ApiOkResponse()
   @ApiNotFoundResponse()
   @Get(':id')
-  getProductById(@Param('id') id:  string ): Promise<Product> {
+  getProductById(@Param('id') id: string): Promise<Product> {
     return this.productService.getProductById(id);
   }
 }

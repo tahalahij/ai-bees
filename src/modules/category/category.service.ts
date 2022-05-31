@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Category, CategoryDocument } from './models/category.model';
 import { MESSAGES } from './constants/constants';
 import { CreateCategoryDto, UpdateCategoryDto } from './dtos/category.dto';
 
 @Injectable()
 export class CategoryService {
-  logger = new Logger();
+  logger = new Logger(CategoryService.name);
   constructor(@InjectModel(Category.name) private categoryModel: Model<CategoryDocument>) {}
 
   async getCategories(page = 1, pageSize = 10): Promise<Category[]> {

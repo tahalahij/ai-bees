@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, ParseIntPipe, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
 import { Category } from './models/category.model';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dtos/category.dto';
@@ -9,10 +9,11 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { Types } from 'mongoose';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.gaurd';
 
 @ApiTags('categories')
 @Controller('categories')
+@UseGuards(JwtAuthGuard)
 export class CategoryController {
   constructor(private readonly service: CategoryService) {}
   @ApiCreatedResponse()
@@ -25,10 +26,7 @@ export class CategoryController {
   @ApiNotFoundResponse()
   @ApiOkResponse()
   @Patch(':id')
-  updateCategory(
-    @Param('id') id:  string,
-    @Body() body: UpdateCategoryDto,
-  ): Promise<Category> {
+  updateCategory(@Param('id') id: string, @Body() body: UpdateCategoryDto): Promise<Category> {
     return this.service.updateCategory(id, body);
   }
 
@@ -50,7 +48,7 @@ export class CategoryController {
   @ApiOkResponse()
   @ApiNotFoundResponse()
   @Get(':id')
-  getCategoryById(@Param('id') id:  string): Promise<Category> {
+  getCategoryById(@Param('id') id: string): Promise<Category> {
     return this.service.getCategoryById(id);
   }
 }

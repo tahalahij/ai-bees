@@ -226,15 +226,14 @@ describe('Product Service Test', () => {
       const { amountAfterDiscount, discount } = await productService.getDiscount({
         amount,
         code,
-        name,
       });
       expect(discount).toBe(category2.discount);
       expect(amountAfterDiscount).toBe(800);
     });
     it('should throw error if product not found', async () => {
-      await expect(
-        productService.getDiscount({ code: 'new code', amount: 1000, name: 'name' }),
-      ).rejects.toThrow(MESSAGES.PRODUCT_NOT_FOUND);
+      await expect(productService.getDiscount({ code: 'new code', amount: 1000 })).rejects.toThrow(
+        MESSAGES.PRODUCT_NOT_FOUND,
+      );
     });
   });
 });
